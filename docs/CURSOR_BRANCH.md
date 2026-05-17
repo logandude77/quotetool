@@ -2,12 +2,25 @@
 
 Cursor-generated Phase 1: open and view STEP files.
 
-## Setup
+## Setup (recommended — pip only, avoids Qt DLL conflicts)
+
+If `quotetool` env is broken, recreate it once:
 
 ```powershell
-cd C:\Projects\quotetool
+conda deactivate
+conda env remove -n quotetool -y
+conda create -n quotetool python=3.12 pip -c conda-forge -y
 conda activate quotetool
-pip install -r requirements.txt
+cd C:\Projects\quotetool
+pip install cadquery PySide6 pyvista pyvistaqt
+```
+
+Do **not** mix `conda install pyside6/vtk` with `pip install` for those same packages.
+
+Quick check:
+
+```powershell
+python -c "import cadquery, pyvista; from PySide6.QtWidgets import QApplication; print('OK')"
 ```
 
 ## Run
