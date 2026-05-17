@@ -1,0 +1,55 @@
+---
+description: quotetool product plan, branch strategy, and user preferences
+alwaysApply: true
+---
+
+# quotetool — project plan and preferences
+
+## Product vision
+
+- Open-source AI-powered **CNC machining quoting** tool (FreeMFGTech).
+- Long-term CAD-adjacent goal; **do not** try to rebuild FreeCAD in v1.
+- Phased delivery: STEP view → geometry metrics → quoting UI → deeper CAD later.
+
+## Repository and workflow
+
+- **Single repo:** `https://github.com/logandude77/quotetool`
+- **Local path:** `C:\Projects\quotetool`
+- **Two experiment branches** (compare tooling, merge winner to `main`):
+  - `cursor/step-viewer` — **only** Cursor-generated implementation
+  - `claude/step-viewer` — **only** Claude-generated implementation
+- `main` holds shared docs, license, and stable merges after review.
+- Prefer **branches over two repos** to avoid drift and duplicate fixes.
+
+## User preferences
+
+- Work in Cursor at `C:\Projects\quotetool`; conda env `quotetool` (Python 3.12).
+- Git identity configured; push via Cursor Source Control or `git push`.
+- Growable architecture from day one — **no monolithic scripts**; avoid coding into a corner.
+- User may use Claude for alternate spikes, but Cursor branch is the primary Cursor deliverable.
+
+## Architecture (all new code)
+
+```
+src/
+  main.py              # thin entry
+  ui/main_window.py    # PySide6 windows, file picker
+  core/step_loader.py  # STEP → mesh/metadata (no UI)
+  viewer/viewport.py   # 3D display only
+```
+
+- UI must not embed quoting or kernel logic.
+- `core` returns clear load results (success, mesh, errors).
+- Phase 2+ adds `core/geometry.py`, then `quoting/` — not in phase 1.
+
+## Phase 1 milestone
+
+- Open `.step` / `.stp` via file dialog.
+- Tessellate via CadQuery, display with PyVista in embedded widget.
+- Clear success/error status in UI.
+
+## Stack
+
+- Python 3.12, conda env `quotetool`
+- CadQuery (OpenCascade), PySide6, PyVista, pyvistaqt
+- Pin versions in `requirements.txt`
