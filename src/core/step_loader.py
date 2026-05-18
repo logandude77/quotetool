@@ -9,6 +9,8 @@ import tempfile
 import cadquery as cq
 import pyvista as pv
 
+from src.core.mesh_orient import orient_largest_face_down
+
 
 @dataclass(frozen=True)
 class StepLoadResult:
@@ -52,6 +54,8 @@ def load_step(path: str | Path) -> StepLoadResult:
                 path=step_path,
                 error="STEP imported but produced an empty mesh.",
             )
+
+        mesh = orient_largest_face_down(mesh)
 
         return StepLoadResult(
             ok=True,

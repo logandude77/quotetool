@@ -64,7 +64,10 @@ class MainWindow(QMainWindow):
             return
 
         self.viewport.show_mesh(result.mesh)
+        spacing = self.viewport.grid_spacing()
+        spacing_text = f", grid unit ≈ {spacing:g}" if spacing else ""
         self.status.setText(
             f"Loaded {result.path.name} — {result.solid_count} solid(s), "
-            f"{result.mesh.n_points:,} vertices."
+            f"{result.mesh.n_points:,} vertices{spacing_text}. "
+            f"Origin at axis center; largest face down."
         )
