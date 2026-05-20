@@ -6,11 +6,12 @@ import pyvista as pv
 from pyvistaqt import QtInteractor
 from PySide6.QtWidgets import QVBoxLayout, QWidget
 
-# Vertical gradient: darker grey (top) → lighter grey (bottom)
-_BG_TOP = "#4a4f57"
-_BG_BOTTOM = "#c8ccd4"
-_GRID_COLOR = "#3b82f6"
-_PART_COLOR = "#4a90d9"
+from src.viewer.reference_grid import build_reference_grid
+
+_BG_TOP = "#3a3f47"
+_BG_BOTTOM = "#c4c9d2"
+_GRID_COLOR = "#b8c6d8"
+_PART_COLOR = "#b0b5be"
 
 
 class StepViewport(QWidget):
@@ -20,35 +21,52 @@ class StepViewport(QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         self.plotter = QtInteractor(self)
         layout.addWidget(self.plotter.interactor)
+        self._grid_spacing: float | None = None
         self._reset_scene()
 
     def _apply_background(self) -> None:
-        # color = bottom; top = darker grey fading upward
         self.plotter.set_background(_BG_BOTTOM, top=_BG_TOP)
 
-    def _apply_grid(self, mesh: pv.PolyData | None = None) -> None:
-        kwargs: dict = {
-            "color": _GRID_COLOR,
-            "location": "back",
-            "font_size": 10,
-        }
-        if mesh is not None:
-            kwargs["bounds"] = mesh.bounds
-        self.plotter.show_grid(**kwargs)
+    def _apply_reference_grid(self, mesh: pv.PolyData) -> None:
+        grid, spacing = build_reference_grid(mesh)
+        self._grid_spacing = spacing
+        self.plotter.add_mesh(
+            grid,
+            color=_GRID_COLOR,
+            line_width=1,
+            opacity=0.38,
+            lighting=False,
+            pickable=False,
+        )
+
+    def _add_part(self, mesh: pv.PolyData) -> None:
+        self.plotter.add_mesh(
+            mesh,
+            color=_PART_COLOR,
+            pbr=True,
+            metallic=0.85,
+            roughness=0.3,
+            smooth_shading=True,
+            show_edges=False,
+        )
 
     def _reset_scene(self, mesh: pv.PolyData | None = None) -> None:
         self.plotter.clear()
         self._apply_background()
-        self.plotter.add_axes()
+        self.plotter.show_axes()
         if mesh is not None:
-            self.plotter.add_mesh(mesh, color=_PART_COLOR, show_edges=True)
-        self._apply_grid(mesh)
+            self._add_part(mesh)
+            self._apply_reference_grid(mesh)
 
     def show_mesh(self, mesh: pv.PolyData) -> None:
         self._reset_scene(mesh)
         self.plotter.reset_camera()
 
+    def grid_spacing(self) -> float | None:
+        return self._grid_spacing
+
     def clear(self) -> None:
+        self._grid_spacing = None
         self._reset_scene()
 
     def closeEvent(self, event) -> None:  # noqa: N802
