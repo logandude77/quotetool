@@ -9,3 +9,5 @@ Open source AI-powered CNC machining quoting tool — FreeMFGTech
 - `claude/step-viewer` — Claude experiment branch
 
 See [docs/BRANCHES.md](docs/BRANCHES.md) and `.cursor/rules/quotetool-project.mdc` for the product plan.
+
+Third-party ports (Mayo, FreeCAD) are tracked in [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES).

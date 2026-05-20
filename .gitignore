@@ -1,3 +1,7 @@
+# Personal Cursor skills — keep in ~/.cursor/skills/, not in git
+.cursor/skills/
+
+scripts/_verify_box.step
 __pycache__/
 *.py[cod]
 *.egg-info/
