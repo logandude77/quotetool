@@ -1,0 +1,60 @@
+# Third-Party Notices — quotetool
+
+This file records open-source projects whose **approaches or code** we port into
+quotetool. See the personal `@interface-skill` for porting rules.
+
+When you add or materially change a port, update the **Ported in quotetool**
+section below with the file path and date.
+
+---
+
+## Mayo
+
+- **Project:** https://github.com/fougue/mayo
+- **License:** BSD-2-Clause
+- **Used for:** STEP/IO patterns, OCC AIS/V3d viewer behavior (not copied wholesale)
+- **Ported in quotetool:** _(none yet — add paths when ported)_
+
+```
+Copyright (c) 2016, Fougue SAS
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice,
+   this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+```
+
+---
+
+## FreeCAD
+
+- **Project:** https://github.com/FreeCAD/FreeCAD
+- **License:** LGPL-2.1-or-later (copyleft)
+- **Used for:** Measurement logic only (`Measurement::findType`, OCC measure math).
+  **Do not** port FreeCAD's Coin3D viewer.
+- **Ported in quotetool:** _(none yet — add paths when ported)_
+
+quotetool is licensed under LGPL-2.1. When porting FreeCAD measurement
+**approaches** into new Python modules, document the source files in the
+**Ported in quotetool** line above. Do not copy large C++ sources verbatim;
+translate into typed Python and run tests before claiming it works.
+
+FreeCAD is Copyright (c) FreeCAD Team. See the FreeCAD repository for the full
+LGPL license text: https://github.com/FreeCAD/FreeCAD/blob/main/LICENSE

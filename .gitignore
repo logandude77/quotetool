@@ -1,3 +1,6 @@
+# Personal Cursor skills — not in git
+.cursor/skills/
+
 __pycache__/
 *.py[cod]
 *.egg-info/
