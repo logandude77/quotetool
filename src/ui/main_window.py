@@ -23,7 +23,7 @@ from src.viewer import StepViewport
 class MainWindow(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
-        self.setWindowTitle("quotetool — STEP viewer")
+        self.setWindowTitle("Open Shop Quote — 3D View")
         self.resize(1100, 760)
 
         root = QWidget()
@@ -63,11 +63,14 @@ class MainWindow(QMainWindow):
             QMessageBox.warning(self, "Load failed", result.error or "Unknown error.")
             return
 
-        self.viewport.show_mesh(result.mesh)
-        spacing = self.viewport.grid_spacing()
-        spacing_text = f", grid unit ≈ {spacing:g}" if spacing else ""
+        unit = result.length_unit
+        if unit is None:
+            self.status.setText(f"Loaded {result.path.name} — missing unit metadata.")
+            return
+
+        self.viewport.show_mesh(result.mesh, unit)
         self.status.setText(
             f"Loaded {result.path.name} — {result.solid_count} solid(s), "
-            f"{result.mesh.n_points:,} vertices{spacing_text}. "
-            f"Origin at axis center; largest face down."
+            f"{result.mesh.n_points:,} vertices ({unit.name} file units). "
+            f"Largest face down; origin at axis center."
         )

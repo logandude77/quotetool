@@ -10,6 +10,7 @@ import cadquery as cq
 import pyvista as pv
 
 from src.core.mesh_orient import orient_largest_face_down
+from src.core.step_units import LengthUnit, detect_step_length_unit
 
 
 @dataclass(frozen=True)
@@ -18,6 +19,7 @@ class StepLoadResult:
     path: Path
     mesh: pv.PolyData | None = None
     solid_count: int = 0
+    length_unit: LengthUnit | None = None
     error: str | None = None
 
 
@@ -35,6 +37,7 @@ def load_step(path: str | Path) -> StepLoadResult:
         )
 
     try:
+        length_unit = detect_step_length_unit(step_path)
         shape = cq.importers.importStep(str(step_path))
         solid_count = len(shape.solids().vals()) if hasattr(shape, "solids") else 1
 
@@ -62,6 +65,7 @@ def load_step(path: str | Path) -> StepLoadResult:
             path=step_path,
             mesh=mesh,
             solid_count=solid_count,
+            length_unit=length_unit,
         )
     except Exception as exc:  # noqa: BLE001 - surface load failures to UI
         return StepLoadResult(ok=False, path=step_path, error=str(exc))

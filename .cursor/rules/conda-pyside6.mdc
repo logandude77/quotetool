@@ -1,0 +1,41 @@
+---
+description: quotetool conda env and PySide6 — avoid recurring import/DLL errors
+alwaysApply: true
+---
+
+# quotetool — conda and PySide6
+
+## Before any `python` command
+
+The prompt **must** show `(quotetool)`, not `(base)`.
+
+```powershell
+conda activate quotetool
+cd C:\Projects\quotetool
+python -m src.main
+```
+
+`ModuleNotFoundError: No module named 'PySide6'` almost always means the **wrong conda env** (usually `base`). PySide6 is installed only in `quotetool`.
+
+## Verify
+
+```powershell
+conda activate quotetool
+python -c "from PySide6.QtWidgets import QApplication; print('OK')"
+```
+
+## Install / repair (pip only in `quotetool` env)
+
+```powershell
+conda deactivate
+conda env remove -n quotetool -y
+conda create -n quotetool python=3.12 pip -c conda-forge -y
+conda activate quotetool
+pip install cadquery PySide6 pyvista pyvistaqt
+```
+
+Do **not** run `conda install pyside6` or `conda install vtk` in the same env after pip — causes DLL errors on Windows.
+
+## DLL load failed (QtWidgets / QtCore)
+
+Same as above: recreate env with pip-only GUI stack. Do not mix conda Qt with pip PySide6.
