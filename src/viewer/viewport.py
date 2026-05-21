@@ -1,56 +1,33 @@
-"""3D viewport wrapper — display only, no file I/O."""
+"""OCC AIS/V3d viewport — display only (Mayo graphics/gui pattern)."""
 
 from __future__ import annotations
 
-import pyvista as pv
-from pyvistaqt import QtInteractor
-from PySide6.QtWidgets import QVBoxLayout, QWidget
+from OCC.Core.TopoDS import TopoDS_Shape
+from OCC.Display.backend import load_backend
 
-# Vertical gradient: darker grey (top) → lighter grey (bottom)
-_BG_TOP = "#4a4f57"
-_BG_BOTTOM = "#c8ccd4"
-_GRID_COLOR = "#3b82f6"
-_PART_COLOR = "#4a90d9"
+# PyQt5 matches pythonocc display on Windows (conda PySide6 can DLL-conflict with OCC).
+load_backend("pyqt5")
+
+from OCC.Display.qtDisplay import qtViewer3d  # noqa: E402
 
 
-class StepViewport(QWidget):
-    def __init__(self, parent: QWidget | None = None) -> None:
+class OccViewport(qtViewer3d):
+    """Embeds AIS_InteractiveContext + V3d_View; no file I/O or analysis."""
+
+    def __init__(self, parent=None) -> None:
         super().__init__(parent)
-        layout = QVBoxLayout(self)
-        layout.setContentsMargins(0, 0, 0, 0)
-        self.plotter = QtInteractor(self)
-        layout.addWidget(self.plotter.interactor)
-        self._reset_scene()
+        self.InitDriver()
+        self._current_ais = None
 
-    def _apply_background(self) -> None:
-        # color = bottom; top = darker grey fading upward
-        self.plotter.set_background(_BG_BOTTOM, top=_BG_TOP)
-
-    def _apply_grid(self, mesh: pv.PolyData | None = None) -> None:
-        kwargs: dict = {
-            "color": _GRID_COLOR,
-            "location": "back",
-            "font_size": 10,
-        }
-        if mesh is not None:
-            kwargs["bounds"] = mesh.bounds
-        self.plotter.show_grid(**kwargs)
-
-    def _reset_scene(self, mesh: pv.PolyData | None = None) -> None:
-        self.plotter.clear()
-        self._apply_background()
-        self.plotter.add_axes()
-        if mesh is not None:
-            self.plotter.add_mesh(mesh, color=_PART_COLOR, show_edges=True)
-        self._apply_grid(mesh)
-
-    def show_mesh(self, mesh: pv.PolyData) -> None:
-        self._reset_scene(mesh)
-        self.plotter.reset_camera()
+    def show_shape(self, shape: TopoDS_Shape) -> None:
+        """Display a B-rep with shaded faces and visible edges."""
+        self._display.EraseAll()
+        # OCCViewer default drawer enables face boundary edges (Mayo-style readability).
+        self._display.DisplayShape(shape, update=True, color="SILVER")
+        self._display.FitAll()
+        self._display.Repaint()
 
     def clear(self) -> None:
-        self._reset_scene()
-
-    def closeEvent(self, event) -> None:  # noqa: N802
-        self.plotter.close()
-        super().closeEvent(event)
+        self._display.EraseAll()
+        self._current_ais = None
+        self._display.Repaint()

@@ -1,3 +1,5 @@
-from .viewport import StepViewport
+"""3D display layer — no geometry computation."""
 
-__all__ = ["StepViewport"]
+from src.viewer.viewport import OccViewport
+
+__all__ = ["OccViewport"]

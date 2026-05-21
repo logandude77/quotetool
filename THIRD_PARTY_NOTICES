@@ -13,7 +13,7 @@ section below with the file path and date.
 - **Project:** https://github.com/fougue/mayo
 - **License:** BSD-2-Clause
 - **Used for:** STEP/IO patterns, OCC AIS/V3d viewer behavior (not copied wholesale)
-- **Ported in quotetool:** _(none yet — add paths when ported)_
+- **Ported in quotetool:** `src/analyzer/step_loader.py` (STEPControl_Reader); `src/viewer/viewport.py` (AIS/V3d display)
 
 ```
 Copyright (c) 2016, Fougue SAS

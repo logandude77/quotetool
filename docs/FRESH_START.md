@@ -7,6 +7,14 @@ Clean restart of Phase 1 on top of the original growable scaffold (`1871957` /
 - No soft-grid / mesh-orient experiments from `cursor/soft-grid-origin`
 - No merged `main` history after PR #1 (this branch stays at the pre-merge baseline)
 
+## Environment (one-time)
+
+```powershell
+conda activate quotetool
+conda install -c conda-forge pythonocc-core -y
+pip install PyQt5 pytest
+```
+
 ## Run locally
 
 ```powershell
@@ -22,6 +30,8 @@ conda activate quotetool
 cd C:\Projects\quotetool
 python -m src.main
 ```
+
+The OCC viewer uses **PyQt5** for `qtViewer3d` (pythonocc display backend on Windows).
 
 ## Build here
 

@@ -1,3 +1,1 @@
-from .step_loader import StepLoadResult, load_step
-
-__all__ = ["StepLoadResult", "load_step"]
+"""Shared non-UI helpers (STEP loading lives in src.analyzer)."""

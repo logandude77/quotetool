@@ -1,48 +1,52 @@
-"""Application window — file picking and status only."""
+"""Main window — File→Open and OCC viewer (no analysis in the UI layer)."""
 
 from __future__ import annotations
 
 from pathlib import Path
 
-from PySide6.QtCore import Qt
-from PySide6.QtWidgets import (
+from PyQt5.QtWidgets import (
+    QAction,
     QFileDialog,
-    QHBoxLayout,
     QLabel,
     QMainWindow,
     QMessageBox,
-    QPushButton,
+    QStatusBar,
     QVBoxLayout,
     QWidget,
 )
 
-from src.core import load_step
-from src.viewer import StepViewport
+from src.analyzer.step_loader import (
+    StepLoadError,
+    format_summary,
+    load_step,
+    summarize as summarize_and_print,
+)
+from src.viewer import OccViewport
 
 
 class MainWindow(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
-        self.setWindowTitle("quotetool — STEP viewer")
+        self.setWindowTitle("Open Shop Quote — 3D View")
         self.resize(1100, 760)
 
-        root = QWidget()
-        self.setCentralWidget(root)
-        layout = QVBoxLayout(root)
+        open_action = QAction("&Open STEP…", self)
+        open_action.setShortcut("Ctrl+O")
+        open_action.triggered.connect(self.open_step_file)
+        file_menu = self.menuBar().addMenu("&File")
+        file_menu.addAction(open_action)
 
-        toolbar = QHBoxLayout()
-        open_btn = QPushButton("Open STEP…")
-        open_btn.clicked.connect(self.open_step_file)
-        toolbar.addWidget(open_btn)
-        toolbar.addStretch()
-        layout.addLayout(toolbar)
+        central = QWidget()
+        self.setCentralWidget(central)
+        layout = QVBoxLayout(central)
+        layout.setContentsMargins(0, 0, 0, 0)
 
-        self.viewport = StepViewport()
-        layout.addWidget(self.viewport, stretch=1)
+        self.viewport = OccViewport(central)
+        layout.addWidget(self.viewport)
 
-        self.status = QLabel("Open a .step or .stp file to begin.")
-        self.status.setWordWrap(True)
-        layout.addWidget(self.status)
+        self.status = QStatusBar()
+        self.setStatusBar(self.status)
+        self.status.showMessage("File → Open STEP to begin.")
 
     def open_step_file(self) -> None:
         path, _ = QFileDialog.getOpenFileName(
@@ -51,20 +55,18 @@ class MainWindow(QMainWindow):
             "",
             "STEP files (*.step *.stp);;All files (*.*)",
         )
-        if not path:
-            return
-        self.load_path(Path(path))
+        if path:
+            self.load_path(Path(path))
 
     def load_path(self, path: Path) -> None:
-        result = load_step(path)
-        if not result.ok or result.mesh is None:
+        try:
+            shape = load_step(path)
+            stats = summarize_and_print(shape)
+        except StepLoadError as exc:
             self.viewport.clear()
-            self.status.setText(f"Failed to load {path.name}: {result.error}")
-            QMessageBox.warning(self, "Load failed", result.error or "Unknown error.")
+            self.status.showMessage(f"Failed to load {path.name}: {exc}")
+            QMessageBox.warning(self, "Load failed", str(exc))
             return
 
-        self.viewport.show_mesh(result.mesh)
-        self.status.setText(
-            f"Loaded {result.path.name} — {result.solid_count} solid(s), "
-            f"{result.mesh.n_points:,} vertices."
-        )
+        self.viewport.show_shape(shape)
+        self.status.showMessage(f"{path.name} — {format_summary(stats)}")
